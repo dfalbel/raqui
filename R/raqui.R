@@ -132,6 +132,20 @@ ra_print_captcha <- function(page){
 }
 
 
+#' download captchas
+#'
+#'
+#'
+ra_download_captchas <- function(n){
+
+    system(paste("xvfb-run python inst/python/ra_render_captcha.py",
+                 n
+    ))
+  }
+}
+
+# ra_download_captchas(100)
+
 #
 #
 #
