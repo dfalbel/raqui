@@ -79,8 +79,9 @@ ra_next_page <- function(page){
   }
 }
 
-ra_get_page <- function(cons){
+ra_get_page <- function(id){
 
+  cons <- ra_create_cons_id(id)
   doc <- ra_get_page_(cons)
 
   # logica para quando for
@@ -151,6 +152,14 @@ ra_get_captcha <- function(page){
 #' funcao que envia o captcha para a página!
 #'
 #'
-ra_send_captcha <- function(page){
-  rPython::python.call('send_captcha', captcha)
+ra_send_captcha <- function(cons, captcha){
+  rPython::python.call('send_captcha', cons, captcha)
+  ra_get_page(cons)
+}
+
+#' Função para criar uma consulta a partir do id a empresa
+#'
+#'
+ra_create_cons_id <- function(id){
+  paste0("/indices/lista_reclamacoes/?id=", id, "&tp=9403f4c8cd5af61c485541e9444950c069c79ffa&subtp=c92a9bc341d739044ff5400661d44a60a808be22")
 }

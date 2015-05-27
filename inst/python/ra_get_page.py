@@ -2,7 +2,7 @@ import dryscrape
 import sys
 
 from pyvirtualdisplay import Display
-display = Display(visible=1, size=(320, 240))
+display = Display(visible=0, size=(320, 240))
 display.start()
 # get arguments form call
 
@@ -20,7 +20,7 @@ def acessa(cons, file, msge):
   # sess = dryscrape.Session(base_url = 'http://www.reclameaqui.com.br')
 
   # we don't need images
-  sess.set_attribute('auto_load_images', False)
+  sess.set_attribute('auto_load_images', True)
 
   # visit
   sess.visit(cons)
@@ -36,7 +36,11 @@ def acessa(cons, file, msge):
 
   #print sess.cookies()
   #return sess.cookies()
-
+  sess.render("hello.png")
+#  cookies = sess.cookies()
+#   sess.visit(cons)
+#   sess.set_cookie(cookies)
+#   sess.render("hello2.png")
   # # save captcha if there's one
   # sess.set_attribute('auto_load_images', True)
   # sess.visit("/indices/lista_reclamacoes/captcha.php")
@@ -46,19 +50,19 @@ def acessa(cons, file, msge):
 def get_cookies():
   return sess.cookies()
 
-
-
 def get_captcha(cap, file):
-  #sess.set_cookie(cookie)
   sess.visit(cap)
   f = open(file, 'wb')
   f.write(sess.body())
   f.close()
 
-def send_captcha(captcha):
+def send_captcha(cons, captcha):
+  # sess.visit(cons)
+  sess.render("hi.png")
   field = sess.at_css('#captcha')
   field.set(captcha)
-  field.form().submit()
+  sess.render("hi2.png")
+  #field.form().submit()
 
 
 

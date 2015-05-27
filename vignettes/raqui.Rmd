@@ -13,15 +13,22 @@ vignette: >
 library(raqui)
 library(rvest)
 
-raqui::ra_start()
+ra_start()
 
 consulta <- "/indices/lista_reclamacoes/?id=902&tp=9403f4c8cd5af61c485541e9444950c069c79ffa&subtp=c92a9bc341d739044ff5400661d44a60a808be22"
 
-page1 <- ra_get_page(consulta)
+page1 <- ra_get_page(902)
 reclamacoes_pag1 <- ra_parse_page(page1)
 
 # veja que aqui o captcha é impresso!!
 page2 <- ra_get_page(ra_next_page(page1)) 
+ra_get_captcha(page2) %>% ler() %>% desenhar()
+page2 <- ra_get_page(ra_next_page(page1)) 
+reclamacoes_pag2 <- ra_parse_page(page2)
+
+
+page2 <- ra_get_page(ra_next_page(page1)) 
+page2 <- ra_send_captcha(ra_next_page(page1), "814224")
 
 ```
 
