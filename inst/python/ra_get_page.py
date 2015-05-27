@@ -32,12 +32,17 @@ def acessa(cons, file, msge):
     print msge
 
   #print sess.cookies()
-  return sess.cookies()
+  #return sess.cookies()
 
   # # save captcha if there's one
   # sess.set_attribute('auto_load_images', True)
   # sess.visit("/indices/lista_reclamacoes/captcha.php")
   # sess.render("test2.png")
+
+
+def get_cookies():
+  return sess.cookies()
+
 
 
 def get_captcha(cap, cookie, file):

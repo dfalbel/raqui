@@ -1,15 +1,12 @@
-#' get page
+#' Começar websrcapping!
 #'
-#' Retorna um objeto com a mesma classe de html(url).
 #'
-#' @param cons pagina consultada
-#' @export
-ra_get_page <- function(cons) {
-  f <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
-  cook <- ra_get_page_(cons, f, message = "__")
-  h <- xml2::read_html(f)
-  return(list(doc = h, cookies = cook))
+ra_start <- function(){
+  a <- system.file('python/ra_get_page.py', package = 'raqui')
+  rPython::python.load(a)
+  print("Iniciado!")
 }
+
 
 #' low level get page
 #'
@@ -19,17 +16,86 @@ ra_get_page <- function(cons) {
 #' @param cons url da página consultada (excluido o dominio)
 #' @param arq arquivo em que deseja salvar a página
 #' @param message mensagem que deseja exibir se o arquivo for salvo com sucesso
-ra_get_page_ <- function(cons, arq, message = "Arquivo obtido com sucesso!"){
-  a <- system.file('python/ra_get_page.py', package = 'raqui')
-  rPython::python.load(a)
-  cook <- rPython::python.call('acessa', cons, arq, message)
-  cook
+ra_get_page__ <- function(cons, arq, message = "Arquivo obtido com sucesso!"){
+  rPython::python.call('acessa', cons, arq, message)
 }
 
-#' pipe connection to python
-ra_pipe_connection <- function() {
-  NULL
+#' Cookies da sessão global criada
+#'
+#'
+ra_get_cookie <- function(){
+  cookie <- rPython::python.call('get_cookies')
+  return(cookie)
 }
+
+
+#' get page
+#'
+#' Retorna um objeto com a mesma classe de html(url).
+#'
+#' @param cons pagina consultada
+#' @export
+ra_get_page_ <- function(cons) {
+  f <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
+  ra_get_page__(cons, f, message = "__")
+  doc <- xml2::read_html(f)
+  file.remove(f) # apaga o arquivo criado
+  return(doc)
+}
+
+#' test validação
+#' testa se é uma página com captcha
+#'
+#'
+ra_test_verif <- function(page){
+  v <- page %>%
+    rvest::html_nodes(".title_16_verde") %>%
+    rvest::html_text() %>%
+    stringr::str_trim()
+  if(length(v) > 0) {
+    TRUE
+  } else {
+    FALSE
+  }
+}
+
+#' next page
+#' busca o link da próxima página de reclamacoes
+#'
+ra_next_page <- function(page){
+  pags <- page %>%
+    rvest::html_nodes(".pagination") %>%
+    rvest::html_nodes("li") %>%
+    rvest::html_nodes("a") %>%
+    rvest::html_attr("href")
+  if(length(pags) >=2 ){
+    ind_na <- (1:length(pags))[is.na(pags)]
+    pags <- pags[(1:length(pags))>ind_na]
+    if(length(pags) >= 1){
+      stringr::str_replace(pags[1] , "http://www.reclameaqui.com.br", "")
+    }
+  }
+}
+
+ra_get_page <- function(cons){
+
+  doc <- ra_get_page_(cons)
+
+  # logica para quando for
+  # pag de validação com captcha
+  if(ra_test_verif(doc)){
+    cookie <- ra_get_cookie()
+    ra_get_captcha(doc, cookie) %>%
+      ler() %>%
+      desenhar()
+    # criar uma funcao que coloca a reposta do captcha
+    # pode ser desenhando e perguntando pro usuario!!
+  }
+  return(doc)
+}
+
+
+
 
 #' parse pagina
 #' Faz o parse da página
@@ -69,46 +135,11 @@ ra_parse_page <- function(page){
   return(d)
 }
 
-#' next page
-#' busca o link da próxima página de reclamacoes
-#'
-ra_next_page <- function(page){
-  pags <- page %>%
-    rvest::html_nodes(".pagination") %>%
-    rvest::html_nodes("li") %>%
-    rvest::html_nodes("a") %>%
-    rvest::html_attr("href")
-  if(length(pags) >=2 ){
-    ind_na <- (1:length(pags))[is.na(pags)]
-    pags <- pags[(1:length(pags))>ind_na]
-    if(length(pags) >= 1){
-      stringr::str_replace(pags[1] , "http://www.reclameaqui.com.br", "")
-    }
-  }
-}
-
-
-#' test validação
-#' testa se é uma página com captcha
-#'
-#'
-ra_test_verif <- function(page){
-  v <- page %>%
-    rvest::html_nodes(".title_16_verde") %>%
-    rvest::html_text() %>%
-    stringr::str_trim()
-  if(length(v) > 0) {
-    TRUE
-  } else {
-    FALSE
-  }
-}
-
 
 #' função para imprimir o captcha recebido
-#' não funciona!!!
 #'
-ra_print_captcha <- function(page, cookies){
+#'
+ra_get_captcha <- function(page, cookies){
   cap <- page$doc %>%
     rvest::html_nodes("form") %>%
     rvest::html_nodes("img") %>%
@@ -116,10 +147,4 @@ ra_print_captcha <- function(page, cookies){
   tmp <- tempfile()
   rPython::python.call('get_captcha', cap, cookies, tmp)
   tmp
-}
-
-
-#' download captchas
-ra_download_captchas <- function(n) {
-  system(paste("xvfb-run python inst/python/ra_render_captcha.py", n))
 }
