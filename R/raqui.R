@@ -1,9 +1,11 @@
 #' Começar websrcapping!
-#'
+#' essa funcao inicia a sessao no site do reclame aqui!
 #'
 ra_start <- function(){
+  # o jeito certo de fazer no pacote
   a <- system.file('python/ra_get_page.py', package = 'raqui')
-  # a <- "inst/python/ra_get_page.py" # uso isso para testar mais rapido
+  # o jeito bom para testar masi rápido
+  # a <- "inst/python/ra_get_page.py"
   rPython::python.load(a)
   print("Iniciado!")
 }
@@ -84,8 +86,7 @@ ra_get_page <- function(cons){
   # logica para quando for
   # pag de validação com captcha
   if(ra_test_verif(doc)){
-    cookie <- ra_get_cookie()
-    ra_get_captcha(doc, cookie) %>%
+    ra_get_captcha(doc) %>%
       ler() %>%
       desenhar() %>%
       plot
@@ -137,12 +138,19 @@ ra_parse_page <- function(page){
 #' função para imprimir o captcha recebido
 #'
 #'
-ra_get_captcha <- function(page, cookies){
+ra_get_captcha <- function(page){
   cap <- page %>%
     rvest::html_nodes("form") %>%
     rvest::html_nodes("img") %>%
     rvest::html_attr("src")
   tmp <- tempfile()
-  rPython::python.call('get_captcha', cap, cookies, tmp)
+  rPython::python.call('get_captcha', cap, tmp)
   tmp
+}
+
+#' funcao que envia o captcha para a página!
+#'
+#'
+ra_send_captcha <- function(page){
+  rPython::python.call('send_captcha', captcha)
 }

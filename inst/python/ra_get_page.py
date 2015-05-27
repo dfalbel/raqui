@@ -48,12 +48,18 @@ def get_cookies():
 
 
 
-def get_captcha(cap, cookie, file):
+def get_captcha(cap, file):
   #sess.set_cookie(cookie)
   sess.visit(cap)
   f = open(file, 'wb')
   f.write(sess.body())
   f.close()
+
+def send_captcha(captcha):
+  field = sess.at_css('#captcha')
+  field.set(captcha)
+  field.form().submit()
+
 
 
 
