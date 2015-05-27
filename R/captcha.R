@@ -29,7 +29,6 @@ ler <- function(a) {
     b = as.vector(img[,,3])
   )
   d <- dplyr::mutate(img_df, cor = rgb(r, g, b), id = 1:n())
-  d <- dplyr::filter(d, cor != '#FFFFFF')
   return(d)
 }
 

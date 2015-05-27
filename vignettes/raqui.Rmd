@@ -1,0 +1,31 @@
+---
+title: "Reclame aqui!"
+author: "Daniel Falbel e Julio Trecenti"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reclame aqui!}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+library(raqui)
+library(rvest)
+
+consulta <- "/indices/lista_reclamacoes/?id=902&tp=9403f4c8cd5af61c485541e9444950c069c79ffa&subtp=c92a9bc341d739044ff5400661d44a60a808be22"
+
+page1 <- ra_get_page(consulta)
+reclamacoes_pag1 <- ra_parse_page(page1$doc)
+
+page2 <- ra_get_page(ra_next_page(page1$doc))
+ra_test_verif(page2$doc) # indica que é uma página de verificação!!
+arq <- ra_print_captcha(page2, page1$cookies)
+
+d <- ler(arq)
+desenhar(d)
+
+# pra fazer a request vc precisa recuperar os cookies...
+# x <- httr::GET(cap, cookies = paste(page2$cookies, collapse = ''))
+```
+
