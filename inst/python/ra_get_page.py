@@ -1,6 +1,9 @@
 import dryscrape
 import sys
 
+from pyvirtualdisplay import Display
+display = Display(visible=1, size=(320, 240))
+display.start()
 # get arguments form call
 
 #arg = sys.argv[1]
