@@ -3,10 +3,10 @@
 #'
 ra_start <- function(){
   a <- system.file('python/ra_get_page.py', package = 'raqui')
+  # a <- "inst/python/ra_get_page.py" # uso isso para testar mais rapido
   rPython::python.load(a)
   print("Iniciado!")
 }
-
 
 #' low level get page
 #'
@@ -28,7 +28,6 @@ ra_get_cookie <- function(){
   return(cookie)
 }
 
-
 #' get page
 #'
 #' Retorna um objeto com a mesma classe de html(url).
@@ -38,7 +37,8 @@ ra_get_cookie <- function(){
 ra_get_page_ <- function(cons) {
   f <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
   ra_get_page__(cons, f, message = "__")
-  doc <- xml2::read_html(f)
+  # doc <- xml2::read_html(f)
+  doc <- rvest::html(f)
   file.remove(f) # apaga o arquivo criado
   return(doc)
 }
@@ -87,15 +87,13 @@ ra_get_page <- function(cons){
     cookie <- ra_get_cookie()
     ra_get_captcha(doc, cookie) %>%
       ler() %>%
-      desenhar()
+      desenhar() %>%
+      plot
     # criar uma funcao que coloca a reposta do captcha
     # pode ser desenhando e perguntando pro usuario!!
   }
   return(doc)
 }
-
-
-
 
 #' parse pagina
 #' Faz o parse da página
@@ -140,7 +138,7 @@ ra_parse_page <- function(page){
 #'
 #'
 ra_get_captcha <- function(page, cookies){
-  cap <- page$doc %>%
+  cap <- page %>%
     rvest::html_nodes("form") %>%
     rvest::html_nodes("img") %>%
     rvest::html_attr("src")
