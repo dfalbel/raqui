@@ -2,19 +2,14 @@
 % Please edit documentation in R/raqui.R
 \name{ra_get_page_}
 \alias{ra_get_page_}
-\title{low level get page}
+\title{get page}
 \usage{
-ra_get_page_(cons, arq, message = "Arquivo obtido com sucesso!")
+ra_get_page_(cons)
 }
 \arguments{
-\item{cons}{url da página consultada (excluido o dominio)}
-
-\item{arq}{arquivo em que deseja salvar a página}
-
-\item{message}{mensagem que deseja exibir se o arquivo for salvo com sucesso}
+\item{cons}{pagina consultada}
 }
 \description{
-Obtem o código html renderizado da página do reclame aqui
-pesquisada e salva em um arquivo
+Retorna um objeto com a mesma classe de html(url).
 }
 
